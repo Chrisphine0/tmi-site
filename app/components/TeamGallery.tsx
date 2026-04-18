@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 interface TeamMember {
   id: number
@@ -51,37 +52,65 @@ const teamMembers: TeamMember[] = [
 ]
 
 export default function TeamGallery() {
-  const [hoveredMember, setHoveredMember] = useState<number | null>(null)
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {teamMembers.map((member) => (
-        <Card
-          key={member.id}
-          className="overflow-hidden transition-transform duration-300 hover:scale-105"
-          onMouseEnter={() => setHoveredMember(member.id)}
-          onMouseLeave={() => setHoveredMember(null)}
-        >
-          <div className="relative h-64 w-full">
-            <Image
-              src={member.image || "/placeholder.svg"}
-              alt={`${member.name} - ${member.role}`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              loading="lazy"
-            />
-          </div>
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold text-green-700">{member.name}</CardTitle>
-            <CardDescription className="text-sm font-medium text-green-600">{member.role}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">{member.bio}</p>
-          </CardContent>
-        </Card>
-      ))}
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {teamMembers.map((member) => (
+          <Card
+            key={member.id}
+            className="overflow-hidden transition-transform duration-300 hover:scale-105"
+          >
+            <div className="flex justify-center pt-6">
+              <Image
+                src={member.image || "/placeholder.svg"}
+                alt={`${member.name} - ${member.role}`}
+                width={150}
+                height={150}
+                className="object-cover rounded-full"
+                loading="lazy"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-green-700">{member.name}</CardTitle>
+              <CardDescription className="text-sm font-medium text-green-600">{member.role}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 line-clamp-3">{member.bio}</p>
+              <DialogTrigger asChild>
+                <button
+                  className="text-green-700 font-semibold mt-2"
+                  onClick={() => setSelectedMember(member)}
+                >
+                  Read More
+                </button>
+              </DialogTrigger>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      {selectedMember && (
+        <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <div className="flex justify-center">
+                <Image
+                  src={selectedMember.image || "/placeholder.svg"}
+                  alt={`${selectedMember.name} - ${selectedMember.role}`}
+                  width={150}
+                  height={150}
+                  className="object-cover rounded-full"
+                  loading="lazy"
+                />
+              </div>
+              <DialogTitle className="text-xl font-semibold text-green-700 text-center">{selectedMember.name}</DialogTitle>
+              <DialogDescription className="text-sm font-medium text-green-600 text-center">{selectedMember.role}</DialogDescription>
+            </DialogHeader>
+            <p className="text-gray-600">{selectedMember.bio}</p>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }
-
